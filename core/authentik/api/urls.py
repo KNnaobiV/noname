@@ -12,9 +12,11 @@ urlpatterns = [
         'profile/<int:pk>/api/', ProfileAPI.as_view(), 
     name='profile_api'
     ),
-    path('register/api/', RegisterAPI.as_view(), name='register_api'),
-    # path("", include(router.urls)),
-    path("login/", TokenPairView.as_view(), name="token_pair"),
-    path("login/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("register/", RegisterView.as_view(), name="register")
+    path('change_password/<int:pk>/', ChangePasswordView.as_view(), name='change_password'),
+    path("login/", LoginView.as_view(), name="login"),
+    path("login/refresh/", TokenRefreshView.as_view(), name="login_refresh"),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('logout_all/', LogoutAllView.as_view(), name='logout_all'),
+    path("register/", RegisterView.as_view(), name="register"),
+    path('update_profile/<int:pk>/', UpdateProfileView.as_view(), name='update_profile'),
 ]
