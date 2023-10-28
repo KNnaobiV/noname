@@ -24,7 +24,7 @@ class BankAccount(models.Model):
         return reverse('banking:account', kwargs={username:self.owner.username})
 
 
-class Transaction(models.Model):
+class DebitTransaction(models.Model):
     CATEGORY_CHOICES = (
         ("clothing", "CLOTHING"),
         ("food", "FOOD"),
@@ -37,6 +37,7 @@ class Transaction(models.Model):
         ("utilities", "UTILITIES"),
         ("other", "OTHER"),
     )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
     date = models.DateField()
@@ -44,17 +45,14 @@ class Transaction(models.Model):
         max_length=20, choices=CATEGORY_CHOICES, blank=False
     )
     notes = models.CharField(max_length=30, blank=True)
-    sender = models.ForeignKey(
-        BankAccount, on_delete=models.DO_NOTHING, related_name="sender"
-    )
     receiver = models.ForeignKey(
         BankAccount, on_delete=models.DO_NOTHING, related_name="receiver"
     )
 
     def __str__(self):
         return f"""
-            {self.amount} on {self.date}: {self.description} from 
-            {self.sender.owner} to {self.receiver.owner}
+            {self.amount} on {self.date}: {self.description} 
+            to {self.receiver.owner}
         """
 
     def clean(self):
@@ -64,5 +62,36 @@ class Transaction(models.Model):
             )
 
     def get_absolute_url(self):
-        return reverse('banking:transaction', kwargs={pk:self.pk})
+        return reverse('banking:debit', kwargs={pk:self.pk})
+
+    class Meta:
+        ordering = ['-date']
+
+
+class CreditTransaction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, blank=False)
+    description = models.TextField()
+    date = models.DateField()
+    sender = models.ForeignKey(
+        BankAccount, on_delete=models.DO_NOTHING, related_name="sender"
+    )
+
+    def __str__(self):
+        return f"""
+            {self.amount} on {self.date}: {self.description} from 
+            {self.sender.owner}
+        """
+
+    def clean(self):
+        if self.category.name == 'other' and not self.notes:
+            raise ValidationError(
+                "If category is 'OTHER', you must specify notes"
+            )
+
+    def get_absolute_url(self):
+        return reverse('banking:credit', kwargs={pk:self.pk})
+
+    class Meta:
+        ordering = ['-date']
 

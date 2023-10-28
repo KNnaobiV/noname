@@ -32,13 +32,17 @@ class Command(BaseCommand):
 
         # Create lenders
         for _ in range(30):
+            usernames = list(set(Provider.first_names))
+            random.seed(4321)
+            shuffle(usernames)
+
             username = fake.unique.user_name()
             email = fake.email()
             password = "fake_pwd"
             user = DefaultUser.objects.create_user(
                 username=username,
                 email=email,
-                password=password
+                password=password,
             )
             user.groups.add(lenders)
 

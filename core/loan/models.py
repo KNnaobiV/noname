@@ -13,8 +13,12 @@ class Loan(models.Model):
         User, on_delete=models.DO_NOTHING, related_name="borrower"
     )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    interest_rate = models.DecimalField(max_digits=5, decimal_places=2)
     loan_date = models.DateField()
     is_repaid = models.BooleanField(default=False)
+    is_insured = models.BooleanField(default=False)
+    repay_date = models.DateField()     
+
 
     def __str__(self):
         return f"{self.amount} loaned from {self.lender.username} to {self.borrower.username}"
@@ -28,7 +32,7 @@ class Loan(models.Model):
 class LoanRequest(models.Model):
     requester = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=7, decimal_places=2)
-    requested_date = models.DateField()
+    interest_rate = models.DecimalField(max_digits=5, decimal_places=2)
     is_approved = models.BooleanField(default=False)
 
     def __str__(self):
@@ -40,13 +44,14 @@ class LoanRequest(models.Model):
         })
 
 
-class LoanRepayment(models.Model):
-    loan = models.ForeignKey(Loan, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    repaid = models.DateField()
+class LoanOffer(models.Model):
+    lender = models.ForeignKey(User, on_delete=models.CASCADE)
+    loan_request = models.ForeignKey(LoanRequest, on_delete=models.CASCADE, blank=True)
+    amount_offered = models.DecimalField(max_digits=10, decimal_places=2)
+    interest_rate = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
-        return f"{self.amount} repaid for loan {self.loan.pk} by {self.loan.borrower.username}"
+        return f"Loan Offer by {self.lender.username}"
 
 
 class CreditScore(models.Model):
