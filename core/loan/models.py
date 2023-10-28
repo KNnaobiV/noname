@@ -1,13 +1,17 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.shortcut import reverse
+from django.shortcuts import reverse
 
 User = get_user_model()
 
 # Create your models here.
 class Loan(models.Model):
-    lender = models.ForeignKey(User, on_delete=models.CASCADE)
-    borrower = models.ForeignKey(User, on_delete=models.CASCADE)
+    lender = models.ForeignKey(
+        User, on_delete=models.DO_NOTHING, related_name="lender"
+    )
+    borrower = models.ForeignKey(
+        User, on_delete=models.DO_NOTHING, related_name="borrower"
+    )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     loan_date = models.DateField()
     is_repaid = models.BooleanField(default=False)
@@ -23,8 +27,8 @@ class Loan(models.Model):
 
 class LoanRequest(models.Model):
     requester = models.ForeignKey(User, on_delete=models.CASCADE)
-    amount = models.DecimalField(decimal_places=2)
-    requested = models.DateTimeField()
+    amount = models.DecimalField(max_digits=7, decimal_places=2)
+    requested_date = models.DateField()
     is_approved = models.BooleanField(default=False)
 
     def __str__(self):

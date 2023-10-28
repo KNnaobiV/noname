@@ -1,17 +1,21 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.shortcut import reverse
+from django.shortcuts import reverse
 
-from .validators import validate_account_number
+from .validators import *
 
 User = get_user_model()
 
 class BankAccount(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     account_number = models.PositiveIntegerField(
-        max_length=10, unique=True, validators=[validate_account_number]
+        unique=True, validators=[validate_account_number]
     )
-    balance = models.DecimalField(decimal_places=2)
+    balance = models.DecimalField(max_digits=15, decimal_places=2)
+    bvn = models.PositiveIntegerField(
+        unique=True, validators=[validate_bvn]
+    )
+    is_activated = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Account: {self.account_number}, Owner: {self.owner.username}"
@@ -27,6 +31,7 @@ class Transaction(models.Model):
         ("health care", "HEALTH CARE"),
         ("hobbies", "HOBBIES"),
         ("housing", "HOUSING"),
+        ("loan", "LOAN"),
         ("subscription", "SUBSCRIPTION"),
         ("transportation", "TRANSPORTATION"),
         ("utilities", "UTILITIES"),
@@ -39,12 +44,18 @@ class Transaction(models.Model):
         max_length=20, choices=CATEGORY_CHOICES, blank=False
     )
     notes = models.CharField(max_length=30, blank=True)
-    bank_account = models.ForeignKey(
-        BankAccount, on_delete=models.SET_NULL, null=True, blank=True
+    sender = models.ForeignKey(
+        BankAccount, on_delete=models.DO_NOTHING, related_name="sender"
+    )
+    receiver = models.ForeignKey(
+        BankAccount, on_delete=models.DO_NOTHING, related_name="receiver"
     )
 
     def __str__(self):
-        return f"{self.amount} on {self.date}: {self.description}"
+        return f"""
+            {self.amount} on {self.date}: {self.description} from 
+            {self.sender.owner} to {self.receiver.owner}
+        """
 
     def clean(self):
         if self.category.name == 'other' and not self.notes:
