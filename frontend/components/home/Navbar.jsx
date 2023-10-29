@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { AiOutlineMenu } from 'react-icons/ai';
 import Link from 'next/link';
 import SubmitBtn from './Buttons/SubmitBtn';
+import Image from 'next/image';
 
 const Navbar = ({ isAuthenticated }) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -14,7 +15,7 @@ const Navbar = ({ isAuthenticated }) => {
 	return (
 		<nav className='fixed text-black bg-white shadow-lg top-0 left-0 z-10  px-4 md:px-12 lg:px-20 py-5 w-full'>
 			<div className=' mx-auto flex items-center justify-between'>
-				<div className=' text-2xl font-bold'>Banking App</div>
+				<Image src='/assets/images/logo.jpg' width={80} height={80} alt='logo' />
 				<div className='hidden sm:flex space-x-4'>
 					<a href='#' className=' hover:underline'>
 						Home

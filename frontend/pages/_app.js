@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import store from '@/Store/store';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import Layout from '@/components/Layout';
 
 export default function App({ Component, pageProps }) {
 	useEffect(() => {
@@ -15,7 +16,9 @@ export default function App({ Component, pageProps }) {
 	}, []);
 	return (
 		<Provider store={store}>
-			<Component {...pageProps} />
+			<Layout>
+				<Component {...pageProps} />
+			</Layout>
 		</Provider>
 	);
 }

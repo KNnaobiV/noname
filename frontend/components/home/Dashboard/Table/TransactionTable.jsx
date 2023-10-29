@@ -4,7 +4,7 @@ import React from 'react';
 
 const TransactionTable = ({ transactions }) => {
 	return (
-		<div className='shadow bg-white p-4'>
+		<div className='shadow bg-white p-4 py-10'>
 			<div className='flex w-full justify-between mb-6'>
 				<h3 className='font-bold text-xl text-gray-800'>Transactions</h3>
 				<Link href='/dashboard/transactions'>
@@ -25,15 +25,15 @@ const TransactionTable = ({ transactions }) => {
 					{transactions.map((transaction) => (
 						<tr key={transaction.id} className='text-gray-800 font-semibold'>
 							<td className='border px-4 py-2 flex items-center gap-2'>
-								<div className='rounded-full p-1 border border-gray-200'>
+								<div className='rounded-full p-1 border-none'>
 									<Image src={transaction.image} height={20} width={20} />
 								</div>
 								{transaction.name}
 							</td>
 							<td className='border px-4 py-2'>{transaction.id}</td>
-							<td className='border px-4 py-2'>{transaction.status}</td>
+							<td className={`border px-4 py-2 ${transaction.status.toLowerCase() === 'completed' && 'text-green-500'} ${transaction.status.toLowerCase() === 'pending' && 'text-pink-500'} ${transaction.status.toLowerCase() === 'failed' && 'text-red-500'}`}>{transaction.status}</td>
 							<td className='border px-4 py-2'>{transaction.date}</td>
-							<td className='border px-4 py-2'>${transaction.amount.toFixed(2)}</td>
+							<td className={`border px-4 py-2 ${transaction.amount > 0 ? 'text-green-500' : 'text-red-500'}`}>${transaction.amount.toFixed(2)}</td>
 						</tr>
 					))}
 				</tbody>
